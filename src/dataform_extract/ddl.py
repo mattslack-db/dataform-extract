@@ -43,7 +43,7 @@ def _reconstruct_relation(relation: dict, ref: str) -> str:
 
     keyword = "VIEW" if rel_type == "VIEW" else "TABLE"
     statements = [_terminate(op) for op in relation.get("preOperations", [])]
-    statements.append(_terminate(f"CREATE OR REPLACE {keyword} {ref} AS\n{select_query}"))
+    statements.append(_terminate(f"CREATE OR REPLACE {keyword} {ref} AS\n{select_query.strip()}"))
     statements.extend(_terminate(op) for op in relation.get("postOperations", []))
 
     sql = "\n\n".join(statements)
