@@ -56,6 +56,17 @@ def test_operations_skipped_when_disabled():
     action = {"target": TARGET, "operations": {"queries": ["CALL foo()"]}}
     assert ddl.reconstruct(action, include_operations=False) is None
 
+def test_operations_empty_queries_returns_none():
+    action = {"target": TARGET, "operations": {"queries": []}}
+    assert ddl.reconstruct(action) is None
+
+def test_leading_newline_in_select_query_is_stripped():
+    # Dataform's compiled selectQuery begins with a newline; the CREATE ... AS
+    # line must not end up with a blank line before the SELECT.
+    action = {"target": TARGET,
+              "relation": {"relationType": "TABLE", "selectQuery": "\nSELECT 1 AS x\n"}}
+    assert ddl.reconstruct(action) == "CREATE OR REPLACE TABLE `proj.ds.orders` AS\nSELECT 1 AS x;"
+
 def test_assertion_off_by_default():
     action = {"target": TARGET, "assertion": {"selectQuery": "SELECT * FROM x WHERE bad"}}
     assert ddl.reconstruct(action) is None
