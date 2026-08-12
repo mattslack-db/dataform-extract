@@ -22,3 +22,11 @@ def test_write_sql_creates_dirs_and_appends_newline(tmp_path):
     written = write_sql(tmp_path, "definitions/orders.sqlx", "SELECT 1;")
     assert written == tmp_path / "definitions/orders.sql"
     assert written.read_text() == "SELECT 1;\n"
+
+def test_rejects_empty_path():
+    with pytest.raises(UnsafePathError):
+        output_path(Path("/tmp/out"), "")
+
+def test_single_component_path():
+    out = output_path(Path("/tmp/out"), "orders.sqlx")
+    assert out == Path("/tmp/out/orders.sql")
