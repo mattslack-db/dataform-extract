@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Run dataform-extract straight from a clone — no pip/pipx/venv needed.
+set -euo pipefail
+here="$(cd "$(dirname "$0")" && pwd)"
+export PYTHONPATH="$here/src"
+exec python3 -m dataform_extract "$@"
