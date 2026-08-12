@@ -15,6 +15,7 @@ class Args:
 
 
 def parse_args(argv: list[str]) -> Args:
+    """Parse and validate argv; return an Args, or raise SystemExit on invalid input."""
     parser = argparse.ArgumentParser(
         prog="dataform-extract",
         description="Compile a GCP Dataform repo and write a mirrored tree of .sql files.",

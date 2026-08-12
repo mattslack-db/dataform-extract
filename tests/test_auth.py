@@ -1,4 +1,3 @@
-import subprocess
 import pytest
 from dataform_extract.auth import get_access_token, AuthError
 

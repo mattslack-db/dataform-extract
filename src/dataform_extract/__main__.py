@@ -74,6 +74,12 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Wrote {summary.written} .sql file(s) to {args.out} "
           f"({summary.skipped} skipped, {summary.warnings} warning(s), "
           f"{summary.incremental} incremental).")
+    if summary.written == 0:
+        print(
+            "WARN: 0 SQL files written — the repo may be empty, fully filtered out, "
+            "or failed to compile (compilation errors are not surfaced by this tool).",
+            file=sys.stderr,
+        )
     return 0
 
 

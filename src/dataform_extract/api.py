@@ -18,6 +18,8 @@ def _default_opener(method: str, url: str, headers: dict, body: bytes | None):
             return response.status, response.read()
     except urllib.error.HTTPError as exc:
         return exc.code, exc.read()
+    except urllib.error.URLError as exc:
+        raise ApiError(f"network error contacting {url}: {exc.reason}")
 
 
 class DataformClient:
@@ -52,7 +54,7 @@ class DataformClient:
         while True:
             url = f"{self._base}/{compilation_result_name}:query"
             if page_token:
-                url += f"?pageToken={quote(page_token)}"
+                url += f"?pageToken={quote(page_token, safe='')}"
             data = self._request("GET", url)
             actions.extend(data.get("compilationResultActions", []))
             page_token = data.get("nextPageToken")

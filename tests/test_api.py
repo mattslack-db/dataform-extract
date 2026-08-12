@@ -1,5 +1,8 @@
 import json
+import urllib.error
+import urllib.request
 import pytest
+from dataform_extract import api as api_module
 from dataform_extract.api import DataformClient, ApiError, BASE_URL
 
 REPO = "projects/p/locations/us/repositories/r"
@@ -50,3 +53,13 @@ def test_non_2xx_raises_api_error():
     with pytest.raises(ApiError) as exc:
         client.create_compilation_result(REPO, commitish="main")
     assert "403" in str(exc.value)
+
+
+def test_default_opener_wraps_urlerror(monkeypatch):
+    def fake_urlopen(request):
+        raise urllib.error.URLError("boom")
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    with pytest.raises(ApiError) as exc:
+        api_module._default_opener("GET", "https://x", {}, None)
+    assert "network error contacting https://x" in str(exc.value)

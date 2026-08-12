@@ -1,8 +1,9 @@
+import json
 from dataform_extract.cli import Args
 from dataform_extract.__main__ import run, Summary
 import dataform_extract.__main__ as m
 from dataform_extract.auth import AuthError
-from dataform_extract.api import ApiError
+from dataform_extract.api import ApiError, DataformClient
 
 def make_args(tmp_path, **over):
     base = dict(repo="projects/p/locations/us/repositories/r", commitish="main",
@@ -114,3 +115,47 @@ def test_main_api_error_returns_1(tmp_path, monkeypatch, capsys):
     assert ret == 1
     captured = capsys.readouterr()
     assert "ERROR: api failed" in captured.err
+
+
+def test_main_zero_written_warns(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(m, "run", lambda args: Summary(0, 0, 0, 0))
+    args = [
+        "--repo", "projects/p/locations/us/repositories/r",
+        "--commitish", "main",
+        "--out", str(tmp_path),
+    ]
+    ret = m.main(args)
+    assert ret == 0
+    captured = capsys.readouterr()
+    assert "WARN: 0 SQL files written" in captured.err
+    assert "compilation errors are not surfaced" in captured.err
+
+
+class _FakeOpener:
+    """Minimal opener that returns queued (status, dict) pairs."""
+    def __init__(self, responses):
+        self._responses = list(responses)
+
+    def __call__(self, method, url, headers, body):
+        status, payload = self._responses.pop(0)
+        return status, json.dumps(payload).encode()
+
+
+def test_run_end_to_end_with_real_client_and_fake_opener(tmp_path):
+    table_action = {
+        "filePath": "definitions/orders.sqlx",
+        "target": {"database": "proj", "schema": "ds", "name": "orders"},
+        "relation": {"relationType": "TABLE", "selectQuery": "SELECT 1"},
+    }
+    fake_opener = _FakeOpener([
+        (200, {"name": "cr/1"}),
+        (200, {"compilationResultActions": [table_action]}),
+    ])
+    args = make_args(tmp_path)
+    summary = run(
+        args,
+        token_getter=lambda: "tok",
+        client_factory=lambda token: DataformClient(token, opener=fake_opener),
+    )
+    assert summary.written == 1
+    assert (tmp_path / "definitions/orders.sql").exists()

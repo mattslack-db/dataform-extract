@@ -58,6 +58,15 @@ PYTHONPATH=src python -m dataform_extract \
 ls -R ./out
 ```
 
+## Known limitations
+
+- **Compilation errors are not surfaced.** Dataform's `createCompilationResult`
+  returns HTTP 200 even when the repository fails to compile. When that happens
+  the tool writes 0 files and exits 0, printing a `WARN: 0 SQL files written`
+  message to stderr. Check the Dataform console for compilation error details.
+- **Assertions are off by default.** Pass `--include-assertions` to emit
+  assertion SELECT statements.
+
 ## Development
 
 ```bash

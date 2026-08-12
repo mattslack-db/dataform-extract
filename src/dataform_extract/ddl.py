@@ -64,7 +64,7 @@ def reconstruct(action: dict, *, include_operations: bool = True,
         if not include_operations:
             return None
         queries = action["operations"].get("queries", [])
-        return "\n\n".join(_terminate(q) for q in queries)
+        return "\n\n".join(_terminate(q) for q in queries) or None
     if "assertion" in action:
         if not include_assertions:
             return None
