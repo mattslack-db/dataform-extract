@@ -26,3 +26,4 @@ echo "built $out"
 "$out" --version
 "$out" --help >/dev/null
 echo "self-check passed"
+rm -rf "$here/build"

@@ -1,5 +1,4 @@
 import subprocess
-import sys
 from pathlib import Path
 
 LAUNCHER = Path(__file__).resolve().parents[1] / "dataform-extract"
