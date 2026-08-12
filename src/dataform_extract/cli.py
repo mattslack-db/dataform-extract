@@ -2,6 +2,8 @@
 import argparse
 from dataclasses import dataclass
 
+from dataform_extract import __version__
+
 
 @dataclass(frozen=True)
 class Args:
@@ -20,6 +22,8 @@ def parse_args(argv: list[str]) -> Args:
         prog="dataform-extract",
         description="Compile a GCP Dataform repo and write a mirrored tree of .sql files.",
     )
+    parser.add_argument("--version", action="version",
+                        version=f"dataform-extract {__version__}")
     parser.add_argument("--repo", required=True,
                         help="projects/{PROJECT}/locations/{REGION}/repositories/{REPO}")
     parser.add_argument("--out", required=True, help="Output root directory.")

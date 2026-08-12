@@ -1,4 +1,5 @@
 import json
+import pytest
 from dataform_extract.cli import Args
 from dataform_extract.__main__ import run, Summary
 import dataform_extract.__main__ as m
@@ -115,6 +116,13 @@ def test_main_api_error_returns_1(tmp_path, monkeypatch, capsys):
     assert ret == 1
     captured = capsys.readouterr()
     assert "ERROR: api failed" in captured.err
+
+
+def test_entry_propagates_exit_code(monkeypatch):
+    monkeypatch.setattr(m, "main", lambda: 3)
+    with pytest.raises(SystemExit) as exc:
+        m._entry()
+    assert exc.value.code == 3
 
 
 def test_main_zero_written_warns(tmp_path, monkeypatch, capsys):

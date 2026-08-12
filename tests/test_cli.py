@@ -27,3 +27,10 @@ def test_commitish_and_workspace_mutually_exclusive():
 def test_requires_one_of_commitish_or_workspace():
     with pytest.raises(SystemExit):
         parse_args(BASE)
+
+def test_version_flag_prints_and_exits_zero(capsys):
+    with pytest.raises(SystemExit) as exc:
+        parse_args(["--version"])
+    assert exc.value.code == 0
+    out = capsys.readouterr().out
+    assert out.strip() == "dataform-extract 0.1.0"

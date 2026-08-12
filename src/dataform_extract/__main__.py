@@ -83,5 +83,10 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-if __name__ == "__main__":
+def _entry() -> None:
+    """Console/zipapp entry point: run main() and exit with its return code."""
     raise SystemExit(main())
+
+
+if __name__ == "__main__":
+    _entry()
